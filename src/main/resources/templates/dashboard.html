@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard | Loan Management System</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body { background-color: #f5f7fb; }
+
+        /* Sidebar */
+        #sidebar {
+            min-width: 220px; max-width: 220px; height: 100vh;
+            position: fixed; top: 0; left: 0;
+            background: #0d6efd; color: #fff; padding-top: 1rem;
+            z-index: 1000;
+        }
+
+        #sidebar .nav-link { color: #fff; }
+        #sidebar .nav-link.active { background-color: #0056b3; }
+
+        /* Main content */
+        #content { margin-left: 220px; padding: 2rem; }
+
+        .card { border: none; border-radius: 12px; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+
+        .table-card { background: white; border-radius: 12px; }
+        .calc-card { background: #212529; color: white; border-radius: 12px; }
+
+        @media (max-width: 768px) {
+            #sidebar { position: relative; height: auto; width: 100%; }
+            #content { margin-left: 0; padding: 1rem; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="sidebar" class="d-flex flex-column">
+    <a class="navbar-brand text-white px-3 mb-4" href="/dashboard">
+        <i class="bi bi-speedometer2"></i> LMS
+    </a>
+
+    <ul class="nav nav-pills flex-column flex-grow-1">
+        <li class="nav-item">
+            <a class="nav-link active" href="/dashboard">
+                <i class="bi bi-house"></i> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/loans">
+                <i class="bi bi-list"></i> Loans
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/members">
+                <i class="bi bi-people"></i> Members
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/loans/new">
+                <i class="bi bi-plus-circle"></i> New Loan
+            </a>
+        </li>
+    </ul>
+
+    <div class="px-3 pb-3">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-outline-light w-100">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="content">
+    <h3 class="fw-bold mb-4"><i class="bi bi-speedometer2 text-primary"></i> Dashboard Overview</h3>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-2 col-sm-6">
+            <div class="card shadow-sm text-center p-3 border-start border-dark border-4">
+                <i class="bi bi-people fs-1 text-dark"></i>
+                <h5 class="mt-2 text-muted small uppercase">Members</h5>
+                <h3 class="fw-bold" th:text="${totalMembers}">0</h3>
+            </div>
+        </div>
+
+        <div class="col-md-2 col-sm-6">
+            <div class="card shadow-sm text-center p-3 border-start border-primary border-4">
+                <i class="bi bi-cash-stack fs-1 text-primary"></i>
+                <h5 class="mt-2 text-muted small uppercase">Total Loans</h5>
+                <h3 class="fw-bold" th:text="${totalCount}">0</h3>
+            </div>
+        </div>
+
+        <div class="col-md-2 col-sm-6">
+            <div class="card shadow-sm text-center p-3 border-start border-info border-4">
+                <i class="bi bi-hourglass-split fs-1 text-info"></i>
+                <h5 class="mt-2 text-muted small uppercase">Pending</h5>
+                <h3 class="fw-bold" th:text="${pendingCount}">0</h3>
+            </div>
+        </div>
+
+        <div class="col-md-2 col-sm-6">
+            <div class="card shadow-sm text-center p-3 border-start border-success border-4">
+                <i class="bi bi-check-circle fs-1 text-success"></i>
+                <h5 class="mt-2 text-muted small uppercase">Approved</h5>
+                <h3 class="fw-bold" th:text="${approvedCount}">0</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card shadow-sm text-center p-3 border-start border-warning border-4">
+                <i class="bi bi-graph-up fs-1 text-warning"></i>
+                <h5 class="mt-2 text-muted small uppercase">Total Released</h5>
+                <h3 class="fw-bold">₱<span th:text="${#numbers.formatDecimal(totalReleased, 1, 'COMMA', 2, 'POINT')}">0.00</span></h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm table-card h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history text-primary"></i> Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Amount</th>
+                                    <th>Term</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="loan : ${loans}">
+                                    <td>
+                                        <div class="fw-bold" th:text="${loan.member != null ? loan.member.fullName : 'Ghost Member'}"></div>
+                                        <small class="text-muted" th:text="${loan.member != null ? loan.member.phone : ''}"></small>
+                                    </td>
+                                    <td class="fw-bold" th:text="'₱' + ${loan.amount}"></td>
+                                    <td th:text="${loan.term} + ' Months'"></td>
+                                    <td>
+                                        <span class="badge rounded-pill" 
+                                              th:classappend="${loan.status.name() == 'APPROVED' ? 'bg-success' : (loan.status.name() == 'REJECTED' ? 'bg-danger' : 'bg-warning')}"
+                                              th:text="${loan.status}">
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(loans)}">
+                                    <td colspan="4" class="text-center text-muted">No recent loans found.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm calc-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-4"><i class="bi bi-calculator-fill text-warning"></i> Loan Calculator</h5>
+                    <div class="mb-3">
+                        <label class="form-label small">Principal Amount</label>
+                        <input type="number" id="cAmount" class="form-control bg-dark text-white border-secondary" placeholder="5000">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Annual Interest (%)</label>
+                        <input type="number" id="cRate" class="form-control bg-dark text-white border-secondary" placeholder="5">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Period (Months)</label>
+                        <input type="number" id="cTerm" class="form-control bg-dark text-white border-secondary" placeholder="12">
+                    </div>
+                    
+                    <div class="mt-4 p-3 rounded bg-secondary bg-opacity-25">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Interest Only:</small>
+                            <span id="resInterest" class="fw-bold">₱0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-top pt-2 mt-2">
+                            <span>Total Payable:</span>
+                            <h4 id="resTotal" class="fw-bold text-warning mb-0">₱0.00</h4>
+                        </div>
+                    </div>
+                    
+                    <button onclick="doCalculation()" class="btn btn-warning w-100 mt-3 fw-bold text-dark">Calculate Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function doCalculation() {
+        const p = parseFloat(document.getElementById('cAmount').value) || 0;
+        const r = parseFloat(document.getElementById('cRate').value) || 0;
+        const t = parseFloat(document.getElementById('cTerm').value) || 0;
+
+        const interest = (p * r * (t / 12)) / 100;
+        const total = p + interest;
+
+        document.getElementById('resInterest').innerText = '₱' + interest.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('resTotal').innerText = '₱' + total.toLocaleString(undefined, {minimumFractionDigits: 2});
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
