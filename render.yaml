@@ -1,7 +1,7 @@
 services:
   - type: web
     name: loan-management-system
-    runtime: docker
+    runtime: docker # This tells Render to use your Dockerfile
     plan: free
     envVars:
       - key: SPRING_DATASOURCE_URL
