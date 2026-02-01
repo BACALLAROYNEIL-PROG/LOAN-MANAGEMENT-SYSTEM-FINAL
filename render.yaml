@@ -3,7 +3,6 @@ services:
     name: loan-management-system
     runtime: docker
     plan: free
-    disk:
-      name: loandb-data
-      mountPath: /opt/render/project/src/data
-      sizeGB: 1
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:h2:file:./data/loandb
