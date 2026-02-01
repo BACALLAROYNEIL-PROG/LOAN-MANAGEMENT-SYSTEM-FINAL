@@ -35,8 +35,13 @@ public class MemberController {
 
     @PostMapping("/save")
     public String saveMember(@ModelAttribute Member member) {
-        memberService.saveMember(member);
-        return "redirect:/members";
+    // 1. ADD THIS LOG: Check your terminal after clicking 'Save'
+    System.out.println("DEBUG: Saving Member ID: " + member.getId());
+    
+    // 2. FORCED SYNC: Ensure the service receives the full object
+    memberService.saveMember(member);
+    
+    return "redirect:/members";
     }
 
     @GetMapping("/edit/{id}")

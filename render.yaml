@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: loan-management-system
+    runtime: java
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/loan-management-system-0.0.1-SNAPSHOT.jar
+    disk:
+      name: loandb-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

@@ -8,6 +8,9 @@
         body { background-color: #f5f7fb; }
         .form-card { border-radius: 15px; border: none; box-shadow: 0 8px 20px rgba(0,0,0,0.08); max-width: 600px; margin: auto; }
         .form-label { font-weight: 600; color: #495057; }
+        .input-group-text { background-color: #f8f9fa; border-right: none; }
+        .form-control { border-left: none; }
+        .form-control:focus { border-color: #dee2e6; box-shadow: none; }
     </style>
 </head>
 <body>
@@ -49,7 +52,8 @@
 
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary btn-lg shadow-sm">
-                    <i class="bi bi-save me-2"></i>Save Member Information
+                    <i class="bi bi-save me-2"></i>
+                    <span th:text="${member.id != null ? 'Update Member' : 'Save Member Information'}">Save</span>
                 </button>
                 <a th:href="@{/members}" class="btn btn-link text-muted text-decoration-none">Cancel and Go Back</a>
             </div>
