@@ -28,7 +28,7 @@ public class SecurityConfig {
             )
             .userDetailsService(customUserDetailsService)
             .authorizeHttpRequests(auth -> auth
-                // ADDED "/error" and "/favicon.ico" to stop the redirect loop
+                // CRITICAL: Permit /error to break the redirect loop
                 .requestMatchers("/login", "/error", "/favicon.ico", "/css/**", "/js/**", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
             )
